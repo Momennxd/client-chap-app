@@ -61,7 +61,7 @@ namespace client.src.socket
 
                     byte[] msgBuf = await ReadExactAsync(length);
 
-                    int req_type = BinaryPrimitives.ReadInt32BigEndian(msgBuf);
+                    int req_type = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(0, 4));
 
                     if (req_type == 6) // message packet
                     {
@@ -70,7 +70,7 @@ namespace client.src.socket
                         if (payload.Length < 12) // group_id + sender_id + content_len
                             throw new InvalidOperationException("Payload too small for message header");
 
-                        message msg = parseMessage(payload.ToArray()); // or change parseMessage to accept Span<byte>
+                        message msg = parseMessage(payload.ToArray()); 
 
                         // safe invoke
                         try { MessageReceived?.Invoke(msg); }
