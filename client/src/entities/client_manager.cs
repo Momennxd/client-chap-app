@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace client
+namespace client.src.entities
 {
     public static class client_manager
     {
