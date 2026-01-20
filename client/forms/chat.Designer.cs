@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             lbMessages = new ListBox();
-            label1 = new Label();
             btnConnect = new Button();
             tbGroupID = new TextBox();
             btnSend = new Button();
             tbMessage = new TextBox();
+            lblGroup = new Label();
             SuspendLayout();
             // 
             // lbMessages
@@ -46,16 +46,6 @@
             lbMessages.Name = "lbMessages";
             lbMessages.Size = new Size(976, 325);
             lbMessages.TabIndex = 0;
-            // 
-            // label1
-            // 
-            label1.AutoSize = true;
-            label1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label1.Location = new Point(368, 42);
-            label1.Name = "label1";
-            label1.Size = new Size(65, 25);
-            label1.TabIndex = 5;
-            label1.Text = "Group";
             // 
             // btnConnect
             // 
@@ -98,19 +88,30 @@
             tbMessage.Size = new Size(498, 80);
             tbMessage.TabIndex = 6;
             // 
+            // lblGroup
+            // 
+            lblGroup.AutoSize = true;
+            lblGroup.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblGroup.Location = new Point(368, 42);
+            lblGroup.Name = "lblGroup";
+            lblGroup.Size = new Size(208, 25);
+            lblGroup.TabIndex = 8;
+            lblGroup.Text = "Connected to group 1...";
+            // 
             // chat
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1268, 672);
+            Controls.Add(lblGroup);
             Controls.Add(btnSend);
             Controls.Add(tbMessage);
-            Controls.Add(label1);
             Controls.Add(btnConnect);
             Controls.Add(tbGroupID);
             Controls.Add(lbMessages);
             Name = "chat";
             Text = "Groups";
+            Load += chat_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -118,10 +119,10 @@
         #endregion
 
         private ListBox lbMessages;
-        private Label label1;
         private Button btnConnect;
         private TextBox tbGroupID;
         private Button btnSend;
         private TextBox tbMessage;
+        private Label lblGroup;
     }
 }

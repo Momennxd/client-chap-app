@@ -28,6 +28,17 @@ namespace client.src.socket
            
         }
 
+        message parseMessage(byte[] msgBuf)
+        {
+            // Assuming the message format is:
+            // group_id (4 bytes), sender_id (4 bytes), content_length (4 bytes), content (variable length)
+            int group_id = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(0, 4));
+            int sender_id = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(4, 4));
+            int content_length = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(8, 4));
+            string content = Encoding.UTF8.GetString(msgBuf, 12, content_length);
+            return new message(group_id, sender_id, content);
+        }
+
         private async Task<int> _ReceiveIDAsync()
         {
             byte[] idBuf = await ReadExactAsync(4);
@@ -46,6 +57,13 @@ namespace client.src.socket
 
                     byte[] msgBuf = await ReadExactAsync(length);
 
+                    int req_type = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(0, 4));
+
+                    if (req_type == 6) // assuming 6 is the message type
+                    {
+                        message msg = parseMessage(msgBuf.AsSpan(4).ToArray());
+                        MessageReceived?.Invoke(msg);
+                    }
 
                     //next step: parse the message
                     // Pass the raw byte array to the parser

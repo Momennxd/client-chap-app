@@ -14,10 +14,18 @@ namespace client.forms
     public partial class chat : Form
     {
 
-        int groupID = -1;
+        int groupID = 1;
         public chat()
         {
             InitializeComponent();
+            req_manager.getRequestHandler()._network_Layer.MessageReceived += gotMessage;
+        }
+
+
+        private void gotMessage(message msg)
+        {
+            if (msg.group_id != this.groupID || msg.sender_id == client_manager.GetID()) return;
+            lbMessages.Items.Add($"User {msg.sender_id}: {msg.content}");
         }
 
         private async void btnConnect_Click(object sender, EventArgs e)
@@ -30,7 +38,7 @@ namespace client.forms
 
             this.groupID = int.Parse(tbGroupID.Text.Trim());
             await req_manager.getRequestHandler().ConnectToGroupAsync(groupID);
-
+            lblGroup.Text = "Connected to Group " + groupID + "...";
         }
 
         private async void btnSend_Click(object sender, EventArgs e)
@@ -42,6 +50,11 @@ namespace client.forms
             tbMessage.Clear();
 
             lbMessages.Items.Add($"You: {msg.content}");
+        }
+
+        private async void chat_Load(object sender, EventArgs e)
+        {
+            await req_manager.getRequestHandler().ConnectToGroupAsync(groupID);
         }
     }
 }

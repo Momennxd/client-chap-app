@@ -24,7 +24,7 @@ namespace client
                  Form chatform = new chat();
                 chatform.ShowDialog();
 
-                MessageBox.Show("Connected to server!");
+               // MessageBox.Show("Connected to server!");
             }
             catch (Exception ex)
             {
