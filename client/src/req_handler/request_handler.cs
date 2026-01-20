@@ -30,10 +30,10 @@ namespace client.src.req_handler
                 BIT.WriteInt32BE(reqBytes, 4, msg.group_id);
                 BIT.WriteInt32BE(reqBytes, 8, client_manager.GetID());
                 BIT.WriteInt32BE(reqBytes, 12, msg.content.Length);
-
-                for (int i = 0; i < msg.content.Length && i + 12 < reqBytes.Length; ++i)
+                int offset = 12 + 4;
+                for (int i = 0; i < msg.content.Length && i + offset < reqBytes.Length; ++i)
                 {
-                    reqBytes[i + 13] = (byte)(msg.content[i]);
+                    reqBytes[i + offset] = (byte)(msg.content[i]);
                 }
 
                 await _network_Layer.SendAsync(reqBytes);

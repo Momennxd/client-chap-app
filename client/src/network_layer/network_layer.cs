@@ -55,26 +55,42 @@ namespace client.src.socket
                     byte[] lenBuf = await ReadExactAsync(4);
                     int length = BinaryPrimitives.ReadInt32BigEndian(lenBuf);
 
+                    // basic sanity checks
+                    if (length <= 0 || length > 10_000_000)
+                        throw new InvalidOperationException($"Invalid length: {length}");
+
                     byte[] msgBuf = await ReadExactAsync(length);
 
-                    int req_type = BinaryPrimitives.ReadInt32BigEndian(msgBuf.AsSpan(0, 4));
+                    int req_type = BinaryPrimitives.ReadInt32BigEndian(msgBuf);
 
-                    if (req_type == 6) // assuming 6 is the message type
+                    if (req_type == 6) // message packet
                     {
-                        message msg = parseMessage(msgBuf.AsSpan(4).ToArray());
-                        MessageReceived?.Invoke(msg);
+                        // ensure remaining buffer length is enough for header
+                        byte[] payload = msgBuf.AsSpan(4).ToArray();
+                        if (payload.Length < 12) // group_id + sender_id + content_len
+                            throw new InvalidOperationException("Payload too small for message header");
+
+                        message msg = parseMessage(payload.ToArray()); // or change parseMessage to accept Span<byte>
+
+                        // safe invoke
+                        try { MessageReceived?.Invoke(msg); }
+                        catch (Exception ex)
+                        {
+                            // subscriber crashed — log but keep read loop alive
+                            Console.WriteLine("MessageReceived handler threw: " + ex);
+                        }
                     }
-
-                    //next step: parse the message
-                    // Pass the raw byte array to the parser
-
-
-
                 }
             }
-            catch
+            catch (OperationCanceledException)
             {
-                Disconnected?.Invoke();
+                // expected during shutdown
+            }
+            catch (Exception ex)
+            {
+                // log the real error for debugging
+                Console.WriteLine("ReadLoop error: " + ex);
+                try { Disconnected?.Invoke(); } catch { /* ignore */ }
             }
         }
 
@@ -106,7 +122,7 @@ namespace client.src.socket
 
             while (read < size)
             {
-                int r = await _stream.ReadAsync(buffer, read, size - read);
+                int r = await _stream.ReadAsync(buffer.AsMemory(read, size - read));
                 if (r == 0)
                     throw new Exception("Disconnected");
 

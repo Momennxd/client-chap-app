@@ -24,7 +24,7 @@ namespace client.forms
 
         private void gotMessage(message msg)
         {
-            if (msg.group_id != this.groupID || msg.sender_id == client_manager.GetID()) return;
+            //if (msg.group_id != this.groupID || msg.sender_id == client_manager.GetID()) return;
             lbMessages.Items.Add($"User {msg.sender_id}: {msg.content}");
         }
 
@@ -47,7 +47,7 @@ namespace client.forms
 
             await req_manager.getRequestHandler().SendMessageAsync(msg);
 
-            tbMessage.Clear();
+         //   tbMessage.Clear();
 
             lbMessages.Items.Add($"You: {msg.content}");
         }
